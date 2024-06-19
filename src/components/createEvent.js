@@ -23,16 +23,22 @@ export const CreateEvent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const token = gapi.auth2
+      .getAuthInstance()
+      .currentUser.get()
+      .getAuthResponse().access_token;
+
     const eventData = {
       summary: event.summary,
       location: event.location,
       description: event.description,
       start: {
-        dateTime: event.start,
+        dateTime: new Date(event.start).toISOString(),
         timeZone: "America/Los_Angeles",
       },
       end: {
-        dateTime: event.end,
+        dateTime: new Date(event.end).toISOString(),
         timeZone: "America/Los_Angeles",
       },
       attendees: event.attendees,
@@ -43,9 +49,14 @@ export const CreateEvent = () => {
         calendarId: "primary",
         resource: eventData,
       })
-      .then((response) => {
-        console.log("Event created: ", response);
-      });
+      .then(
+        (response) => {
+          console.log("Event created: ", response);
+        },
+        (error) => {
+          console.error("Error creating event: ", error);
+        },
+      );
   };
 
   return (
